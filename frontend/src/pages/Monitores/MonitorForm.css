@@ -1,0 +1,162 @@
+.monitor-form-page {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 100%;
+  min-height: 0;
+}
+
+.monitor-form-page__title {
+  width: 100%;
+  text-align: center;
+  font-size: 1.6rem;
+  font-style: italic;
+  font-weight: 700;
+  color: #1f2630;
+  margin: 0;
+}
+
+.monitor-form-page__card {
+  width: 100%;
+  max-width: 520px;
+  border-radius: 12px;
+  border: 1px solid #d0d3d8;
+  background-color: #eceeef;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 16px 20px 18px;
+}
+
+.monitor-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.monitor-form__title {
+  font-size: 1.55rem;
+  font-style: italic;
+  color: #1f2630;
+  margin: 0 0 8px;
+}
+
+.monitor-form__label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #2d3748;
+  margin-bottom: 2px;
+}
+
+.monitor-form__required {
+  color: #d64b4b;
+}
+
+.monitor-form__input,
+.monitor-form__select {
+  width: 100%;
+  border: 1px solid #c6ccd5;
+  border-radius: 10px;
+  background-color: #f6f7f8;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  color: #243143;
+  margin-bottom: 4px;
+}
+
+.monitor-form__input::placeholder {
+  color: #9ea4ad;
+}
+
+.monitor-form__input:focus,
+.monitor-form__select:focus {
+  outline: none;
+  border-color: #7388a9;
+  box-shadow: 0 0 0 3px rgba(115, 136, 169, 0.18);
+}
+
+.monitor-form__password-wrap {
+  position: relative;
+}
+
+.monitor-form__input--password {
+  padding-right: 40px;
+}
+
+.monitor-form__password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  border: none;
+  background: transparent;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.monitor-form__password-toggle img {
+  width: 18px;
+  height: 18px;
+}
+
+.monitor-form__select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #111 50%), linear-gradient(135deg, #111 50%, transparent 50%);
+  background-position: calc(100% - 16px) calc(50% - 1px), calc(100% - 10px) calc(50% - 1px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+  margin-bottom: 6px;
+}
+
+.monitor-form__button {
+  width: 100%;
+  border-radius: 10px;
+  font-size: 1.45rem;
+  font-weight: 700;
+  font-style: italic;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.monitor-form__button--primary {
+  background-color: #ea752f;
+  border: 1px solid #ea752f;
+  color: #fff;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.monitor-form__button--secondary {
+  background-color: transparent;
+  border: 1px solid #2e4b81;
+  color: #2e4b81;
+}
+
+@media (max-width: 800px) {
+  .monitor-form-page__title {
+    text-align: left;
+    font-size: 1.5rem;
+  }
+
+  .monitor-form-page__card {
+    max-width: 100%;
+    padding: 18px 14px;
+  }
+
+  .monitor-form__title {
+    font-size: 1.45rem;
+  }
+
+  .monitor-form__label {
+    font-size: 0.9rem;
+  }
+
+  .monitor-form__button {
+    font-size: 1.25rem;
+  }
+}

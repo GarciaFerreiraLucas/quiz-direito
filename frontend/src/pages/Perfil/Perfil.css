@@ -1,0 +1,152 @@
+.perfil {
+  padding: 5px 5px;
+  max-width: 600px;
+  margin: 0;
+}
+
+.perfil__title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--footer-bg);
+  margin-bottom: 30px;
+  font-style: italic;
+}
+
+.perfil__form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.perfil__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.perfil__label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--footer-bg);
+  font-style: italic;
+}
+
+.perfil__input {
+  padding: 8px 12px;
+  border: 1px solid #d1d9e6;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #333;
+  width: 100%;
+}
+
+.perfil__input:focus {
+  outline: none;
+  border-color: #1a2b4b;
+  box-shadow: 0 0 0 2px rgba(26, 43, 75, 0.1);
+}
+
+.perfil__password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.perfil__password-controls {
+  position: absolute;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.perfil__show-password-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1a2b4b;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.perfil__password-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.perfil__password-icon {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0.2);
+}
+
+.perfil__password-icon--active {
+  filter: brightness(0.5) invert(0.5) sepia(1) hue-rotate(200deg) saturate(3);
+}
+
+.perfil__error {
+  color: #d93025;
+  font-size: 0.85rem;
+  margin-top: -10px;
+}
+
+.perfil__success {
+  color: #188038;
+  font-size: 0.85rem;
+  margin-top: -10px;
+}
+
+.perfil__actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.perfil__btn {
+  padding: 10px 30px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-style: italic;
+  min-width: 200px;
+}
+
+.perfil__btn--submit {
+  background-color: var(--footer-bg);
+  color: white;
+  border: none;
+}
+
+.perfil__btn--submit:hover {
+  background-color: #2a3d5b;
+}
+
+.perfil__btn--cancel {
+  background-color: white;
+  color: var(--footer-bg);
+  border: 1px solid var(--footer-bg);
+}
+
+.perfil__btn--cancel:hover {
+  background-color: #f5f7fa;
+}
+
+@media (max-width: 600px) {
+  .perfil {
+    padding: 20px;
+  }
+
+  .perfil__actions {
+    flex-direction: column;
+  }
+
+  .perfil__btn {
+    min-width: 100%;
+  }
+}

@@ -1,0 +1,129 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ---- Hamburger (hidden on desktop) ---- */
+.header__hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.header__hamburger-line {
+  width: 24px;
+  height: 3px;
+  background-color: var(--white);
+  border-radius: 2px;
+  transition: transform 0.2s ease;
+}
+
+.header__brand {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: 0.02em;
+}
+
+.header__title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+/* Mobile title (hidden on desktop) */
+.header__mobile-title {
+  display: none;
+}
+
+.header__logos {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header__logo-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.header__logo-circle img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .header {
+    padding: 0 14px;
+    height: 64px;
+    justify-content: center;
+  }
+
+  .header__hamburger {
+    display: flex;
+    position: absolute;
+    left: 14px;
+  }
+
+  .header__brand {
+    display: none;
+  }
+
+  .header__title {
+    display: none;
+  }
+
+  .header__mobile-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.3;
+  }
+
+  .header__mobile-title-main {
+    font-size: 1.05rem;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--white);
+  }
+
+  .header__mobile-title-sub {
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--white);
+    opacity: 0.9;
+  }
+
+  .header__logos {
+    display: none;
+  }
+}

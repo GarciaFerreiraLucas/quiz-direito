@@ -1,0 +1,234 @@
+.informativos {
+  width: 100%;
+}
+
+/* ---- Header bar (tabs + filter) ---- */
+.informativos__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.informativos__tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.informativos__tab {
+  padding: 10px 24px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid var(--primary);
+  background-color: transparent;
+  color: var(--primary);
+}
+
+.informativos__tab--active {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.informativos__tab:hover:not(.informativos__tab--active) {
+  background-color: rgba(9, 64, 120, 0.08);
+}
+
+.informativos__filter-wrapper {
+  position: relative;
+}
+
+.informativos__filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.informativos__filter:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.informativos__filter--active {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.informativos__filter--active:hover {
+  background-color: #003d7a;
+}
+
+.informativos__filter-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---- Dropdown ---- */
+.informativos__dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  background-color: var(--white);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+  z-index: 500;
+  animation: dropdownFade 0.15s ease;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.informativos__dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.informativos__dropdown-item:hover {
+  background-color: rgba(9, 64, 120, 0.06);
+}
+
+.informativos__dropdown-item--active {
+  background-color: var(--primary);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.informativos__dropdown-item--active:hover {
+  background-color: #003d7a;
+}
+
+/* ---- Empty state ---- */
+.informativos__empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+/* ---- Card grid ---- */
+.informativos__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+/* ---- Card ---- */
+.informativos__card {
+  background-color: var(--white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.informativos__card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.informativos__card-image {
+  width: 100%;
+  height: 120px;
+  background-color: #e4e4ec;
+}
+
+.informativos__card-body {
+  padding: 12px 14px 14px;
+}
+
+.informativos__card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.informativos__card-title-icon {
+  font-size: 0.82rem;
+}
+
+.informativos__card-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.informativos__card-tag {
+  display: inline-block;
+  padding: 4px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: 16px;
+  background: transparent;
+}
+
+.informativos__card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.informativos__card-questions {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
+  .informativos__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .informativos__grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .informativos__tabs {
+    flex: 1;
+  }
+
+  .informativos__tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+  }
+}

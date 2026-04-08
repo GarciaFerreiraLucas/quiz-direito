@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@import "tailwindcss";
+
+:root {
+  --primary: #094078;
+  --primary-light: #0b4d91;
+  --primary-dark: #072d55;
+  --bg-page: #f0f2f5;
+  --bg-card: #e8ebef;
+  --text-dark: #1a1a2e;
+  --text-muted: #555;
+  --text-link: #094078;
+  --border-input: #ccc;
+  --white: #ffffff;
+  --footer-bg: #094078;
+  --footer-text: #ffffff;
+  --management-card-height: clamp(560px, calc(100vh - 230px), 760px);
+  --management-card-padding: 18px 20px;
+  --management-card-radius: 14px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-dark);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Padronizacao de tamanho dos cards de gestao */
+.tags-list-page__card,
+.categorias-list-page__card,
+.quizzes-list-page__card,
+.perguntas-page__card,
+.monitores-page__card,
+.tag-form-page__card,
+.categoria-form-page__card,
+.quiz-form-page__card,
+.pergunta-form-page__card,
+.monitor-form-page__card {
+  min-height: var(--management-card-height) !important;
+  padding: var(--management-card-padding) !important;
+  border-radius: var(--management-card-radius) !important;
+}
+
+.tags-list-page,
+.categorias-list-page,
+.quizzes-list-page,
+.perguntas-page,
+.monitores-page,
+.tag-form-page,
+.categoria-form-page,
+.quiz-form-page,
+.pergunta-form-page,
+.monitor-form-page {
+  min-height: calc(100vh - 220px) !important;
+}
+
+@media (max-width: 980px) {
+  .tags-list-page__card,
+  .categorias-list-page__card,
+  .quizzes-list-page__card,
+  .perguntas-page__card,
+  .monitores-page__card,
+  .tag-form-page__card,
+  .categoria-form-page__card,
+  .quiz-form-page__card,
+  .pergunta-form-page__card,
+  .monitor-form-page__card {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
