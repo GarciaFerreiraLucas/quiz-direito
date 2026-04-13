@@ -1,9 +1,10 @@
-import { Request, Response } from 'express';
+import { Request, Response } from "express";
 
-export const getHomeInfo = (req: Request, res: Response) => {
-  res.json({
-    message: 'Hello from Node.js & Express Backend!',
-    status: 'success',
-    databaseAvailable: 'MariaDB setup is ready (connection requires proper credentials)'
-  });
-};
+export class HomeController {
+  static index(req: Request, res: Response): void {
+    res.status(200).json({
+      message: "API Quiz Jurídico funcionando",
+      status: "online",
+    });
+  }
+} 
