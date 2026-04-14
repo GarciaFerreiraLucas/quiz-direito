@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Footer } from '../../components/Footer';
@@ -12,7 +12,7 @@ export function Login() {
   const navigate = useNavigate();
   const { login, loginAsGuest } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -21,11 +21,15 @@ export function Login() {
       return;
     }
 
-    const success = login(email.trim(), senha);
-    if (success) {
-      navigate('/dashboard');
-    } else {
-      setError('Usuário ou senha incorretos.');
+    try {
+      const success = await login(email.trim(), senha);
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        setError('Usuário ou senha incorretos.');
+      }
+    } catch {
+      setError('Erro ao conectar com o servidor.');
     }
   };
 
@@ -89,7 +93,7 @@ export function Login() {
           </form>
 
           <div className="login-page__links">
-            <a href="#" className="login-page__link">Esqueci a senha</a>
+            <Link to="/esqueci-senha" className="login-page__link">Esqueci a senha</Link>
             <Link to="/cadastro" className="login-page__link">Criar conta</Link>
           </div>
 

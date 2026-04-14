@@ -35,6 +35,11 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     { label: 'Informativos', to: '/dashboard/informativos', icon: iconeInformativos },
   ];
 
+  // Histórico for authenticated users (not guests)
+  if (!isGuest) {
+    menuItems.push({ label: 'Histórico', to: '/dashboard/historico', icon: iconeQuiz });
+  }
+
   // Specific items for monitor/professor
   if (user?.role === 'monitor' || user?.role === 'professor') {
     menuItems.push(

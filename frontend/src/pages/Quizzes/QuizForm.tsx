@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getCadastroItemById, getCadastroItems, saveCadastroItem } from '../../utils/cadastroStore';
+import api from '../../services/api';
 import './QuizForm.css';
 
 export function QuizForm() {
@@ -18,45 +18,80 @@ export function QuizForm() {
     return numericId;
   }, [searchParams]);
 
-  const tagsDisponiveis = useMemo(
-    () => getCadastroItems('tags').map((item) => item.nome).filter((nomeTag, index, lista) => lista.indexOf(nomeTag) === index),
-    [],
-  );
-
+  const [categorias, setCategorias] = useState<any[]>([]);
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
-  const [tag, setTag] = useState('');
+  const [categoriaId, setCategoriaId] = useState<number | ''>('');
+  const [tempoEstimado, setTempoEstimado] = useState(10);
+  const [tentativasMax, setTentativasMax] = useState(3);
   const [status, setStatus] = useState<'ativo' | 'inativo'>('ativo');
+  const [error, setError] = useState('');
 
+  // Load categories from API for the dropdown
+  useEffect(() => {
+    async function loadCategorias() {
+      try {
+        const res = await api.get('/categorias');
+        setCategorias(res.data || []);
+      } catch (err) {
+        console.error('Erro ao carregar categorias:', err);
+      }
+    }
+    loadCategorias();
+  }, []);
+
+  // Load existing quiz data if editing — uses GET /quizzes/:id
   useEffect(() => {
     if (!editingId) return;
 
-    const item = getCadastroItemById('quizzes', editingId);
-    if (!item) return;
-
-    setNome(item.nome);
-    setDescricao(item.descricao);
-    setTag(item.tag ?? '');
-    setStatus(item.ativo ? 'ativo' : 'inativo');
+    async function loadQuiz() {
+      try {
+        const res = await api.get(`/quizzes/${editingId}`);
+        const quiz = res.data;
+        if (quiz) {
+          setNome(quiz.titulo || quiz.nome || '');
+          setDescricao(quiz.descricao || '');
+          setCategoriaId(quiz.id_categoria || '');
+          setTempoEstimado(quiz.tempo_estimado_min || 10);
+          setTentativasMax(quiz.tentativas_max || 3);
+          setStatus(quiz.ativo ? 'ativo' : 'inativo');
+        }
+      } catch (err) {
+        console.error('Erro ao carregar quiz:', err);
+      }
+    }
+    loadQuiz();
   }, [editingId]);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError('');
 
-    if (!nome.trim() || !tag.trim()) return;
+    if (!nome.trim()) {
+      setError('Título é obrigatório.');
+      return;
+    }
 
-    saveCadastroItem(
-      'quizzes',
-      {
-        nome,
-        descricao,
-        tag,
+    try {
+      const payload = {
+        nome: nome.trim(),
+        descricao: descricao.trim(),
         ativo: status === 'ativo',
-      },
-      editingId ?? undefined,
-    );
+        id_categoria: categoriaId || null,
+        tempo_estimado_min: tempoEstimado,
+        tentativas_max: tentativasMax,
+      };
 
-    navigate('/dashboard/quizzes');
+      if (editingId) {
+        await api.put(`/quizzes/${editingId}`, payload);
+      } else {
+        await api.post('/quizzes', payload);
+      }
+
+      navigate('/dashboard/quizzes');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Erro ao salvar quiz.');
+    }
   }
 
   return (
@@ -64,7 +99,9 @@ export function QuizForm() {
       <div className="quiz-form-page__card">
         <div className="quiz-form-page__content">
           <form className="quiz-form" onSubmit={handleSubmit}>
-            <h3 className="quiz-form__title">Quiz</h3>
+            <h3 className="quiz-form__title">{editingId ? 'Editar Quiz' : 'Novo Quiz'}</h3>
+
+            {error && <p style={{ color: '#c0392b', marginBottom: '12px', fontSize: '0.95rem' }}>{error}</p>}
 
             <label className="quiz-form__label" htmlFor="quiz-nome">
               Título <span className="quiz-form__required">*</span>
@@ -89,23 +126,46 @@ export function QuizForm() {
               onChange={(event) => setDescricao(event.target.value)}
             />
 
-            <label className="quiz-form__label" htmlFor="quiz-tag">
-              Tag <span className="quiz-form__required">*</span>
+            <label className="quiz-form__label" htmlFor="quiz-categoria">
+              Categoria
             </label>
             <select
-              id="quiz-tag"
+              id="quiz-categoria"
               className="quiz-form__select"
-              value={tag}
-              onChange={(event) => setTag(event.target.value)}
-              required
+              value={categoriaId}
+              onChange={(event) => setCategoriaId(event.target.value ? Number(event.target.value) : '')}
             >
               <option value="">Selecionar</option>
-              {tagsDisponiveis.map((nomeTag) => (
-                <option key={nomeTag} value={nomeTag}>
-                  {nomeTag}
+              {categorias.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.nome}
                 </option>
               ))}
             </select>
+
+            <label className="quiz-form__label" htmlFor="quiz-tempo">
+              Tempo estimado (min)
+            </label>
+            <input
+              id="quiz-tempo"
+              type="number"
+              min={1}
+              className="quiz-form__input"
+              value={tempoEstimado}
+              onChange={(event) => setTempoEstimado(Number(event.target.value))}
+            />
+
+            <label className="quiz-form__label" htmlFor="quiz-tentativas">
+              Tentativas máximas
+            </label>
+            <input
+              id="quiz-tentativas"
+              type="number"
+              min={1}
+              className="quiz-form__input"
+              value={tentativasMax}
+              onChange={(event) => setTentativasMax(Number(event.target.value))}
+            />
 
             <label className="quiz-form__label" htmlFor="quiz-status">
               Status

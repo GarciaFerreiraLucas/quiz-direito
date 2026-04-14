@@ -1,4 +1,4 @@
-﻿.tags-list-page {
+.tags-list-page {
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
@@ -23,7 +23,26 @@
 .tags-list-page__header {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 14px;
+}
+
+.tags-list-page__search {
+  flex: 1;
+  max-width: 320px;
+  padding: 8px 14px;
+  border: 1px solid #d6d9dd;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: #fff;
+  color: #3e3e3e;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.tags-list-page__search:focus {
+  border-color: #2e5ba8;
 }
 
 .tags-list-page__add-btn {

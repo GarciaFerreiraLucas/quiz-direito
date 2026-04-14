@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 import { Footer } from '../../components/Footer';
 import logoSrc from '../../assets/logoname.png';
 import './Cadastro.css';
@@ -10,10 +11,34 @@ export function Cadastro() {
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: integrar com backend
-    console.log('Cadastro:', { nome, email, senha, confirmarSenha });
+    setFeedback(null);
+
+    if (senha !== confirmarSenha) {
+      setFeedback({ message: 'As senhas não coincidem.', type: 'error' });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await api.post('/auth/register', { nome, email, senha, confirmarSenha });
+      setFeedback({ message: res.data.message, type: 'success' });
+      
+      // Auto-redirect to login after short delay
+      setTimeout(() => navigate('/'), 3000);
+    } catch (err: any) {
+      setFeedback({
+        message: err.response?.data?.error || 'Não foi possível efetuar o cadastro.',
+        type: 'error',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,6 +57,15 @@ export function Cadastro() {
         {/* Card de Cadastro */}
         <div className="cadastro-page__card">
           <h1 className="cadastro-page__title">Fazer Cadastro</h1>
+
+          {feedback && (
+            <div
+              className={`login-page__error`}
+              style={{ backgroundColor: feedback.type === 'success' ? '#e8f5e9' : '#ffebee', color: feedback.type === 'success' ? '#2e7d32' : '#c62828', marginBottom: '16px' }}
+            >
+              {feedback.message}
+            </div>
+          )}
 
           <form className="cadastro-page__form" onSubmit={handleSubmit}>
             {/* Nome */}
@@ -99,8 +133,8 @@ export function Cadastro() {
             </div>
 
             {/* Botão Cadastrar */}
-            <button type="submit" className="cadastro-page__btn-primary" id="btn-cadastrar">
-              Cadastrar
+            <button type="submit" className="cadastro-page__btn-primary" id="btn-cadastrar" disabled={loading}>
+              {loading ? 'Processando...' : 'Cadastrar'}
             </button>
           </form>
 

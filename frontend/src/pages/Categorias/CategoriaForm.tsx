@@ -1,13 +1,15 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import categoriaImage from '../../assets/categoria.png';
-import { getCadastroItemById, saveCadastroItem } from '../../utils/cadastroStore';
+import api from '../../services/api';
+import { useToast } from '../../components/Toast/Toast';
 import './CategoriaForm.css';
 
 export function CategoriaForm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { showToast } = useToast();
 
   const editingId = useMemo(() => {
     const rawId = searchParams.get('id');
@@ -21,32 +23,53 @@ export function CategoriaForm() {
 
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!editingId) return;
 
-    const item = getCadastroItemById('categorias', editingId);
-    if (!item) return;
+    async function fetchItem() {
+      try {
+        const { data } = await api.get(`/categorias/${editingId}`);
+        setNome(data.nome);
+        setDescricao(data.descricao);
+      } catch (err) {
+        console.error('Erro ao buscar categoria', err);
+        showToast('Erro ao carregar os dados da categoria.', 'error');
+      }
+    }
 
-    setNome(item.nome);
-    setDescricao(item.descricao);
-  }, [editingId]);
+    fetchItem();
+  }, [editingId, showToast]);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!nome.trim()) return;
+    if (!nome.trim() || isLoading) return;
 
-    saveCadastroItem(
-      'categorias',
-      {
-        nome,
-        descricao,
-      },
-      editingId ?? undefined,
-    );
-
-    navigate('/dashboard/categorias');
+    setIsLoading(true);
+    try {
+      if (editingId) {
+        await api.put(`/categorias/${editingId}`, {
+          nome,
+          descricao,
+          ativo: true,
+        });
+        showToast('Categoria atualizada com sucesso.');
+      } else {
+        await api.post('/categorias', {
+          nome,
+          descricao,
+        });
+        showToast('Categoria cadastrada com sucesso.');
+      }
+      navigate('/dashboard/categorias');
+    } catch (err) {
+      console.error('Erro ao salvar categoria', err);
+      showToast('Erro ao salvar categoria.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -79,8 +102,12 @@ export function CategoriaForm() {
               onChange={(event) => setDescricao(event.target.value)}
             />
 
-            <button className="categoria-form__button categoria-form__button--primary" type="submit">
-              {editingId ? 'Salvar' : 'Cadastrar'}
+            <button
+              className="categoria-form__button categoria-form__button--primary"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? (editingId ? 'Salvando...' : 'Cadastrando...') : (editingId ? 'Salvar' : 'Cadastrar')}
             </button>
 
             <button

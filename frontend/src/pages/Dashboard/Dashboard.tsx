@@ -1,6 +1,6 @@
 import { useAuth } from '../../context/AuthContext';
 import { MonitorDashboard } from './MonitorDashboard';
-import '../Quizzes/Quizzes.css';
+import { UserDashboard } from './UserDashboard';
 
 export function Dashboard() {
   const { user } = useAuth();
@@ -9,10 +9,5 @@ export function Dashboard() {
     return <MonitorDashboard />;
   }
 
-  return (
-    <section className="page-placeholder" id="dashboard-page">
-      <h2>Início</h2>
-      <p>Bem-vindo! Conteúdo do Início em breve.</p>
-    </section>
-  );
+  return <UserDashboard />;
 }

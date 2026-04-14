@@ -1,16 +1,17 @@
-﻿import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import type { User, UserRole } from '../types/auth';
-import { authenticateUser, getGuestUser, updateMockUserProfile } from '../services/authService';
+import { authenticateUser, getGuestUser } from '../services/authService';
+import api from '../services/api';
 
 interface AuthContextData {
   user: User | null;
   isAuthenticated: boolean;
   isGuest: boolean;
-  login: (login: string, password: string) => boolean;
+  login: (login: string, password: string) => Promise<boolean>;
   loginAsGuest: () => void;
   logout: () => void;
   hasRole: (role: UserRole | UserRole[]) => boolean;
-  updateProfile: (data: Partial<User> & { password?: string }) => void;
+  updateProfile: (data: Partial<User> & { password?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -22,8 +23,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
   const [isGuest, setIsGuest] = useState<boolean>(() => sessionStorage.getItem('quiz_is_guest') === 'true');
 
-  const login = useCallback((loginStr: string, password: string): boolean => {
-    const authenticated = authenticateUser(loginStr, password);
+  const login = useCallback(async (loginStr: string, password: string): Promise<boolean> => {
+    const authenticated = await authenticateUser(loginStr, password);
     if (authenticated) {
       setUser(authenticated);
       sessionStorage.setItem('quiz_user', JSON.stringify(authenticated));
@@ -46,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     sessionStorage.removeItem('quiz_user');
     sessionStorage.removeItem('quiz_is_guest');
+    localStorage.removeItem('token');
     setIsGuest(false);
   }, []);
 
@@ -59,12 +61,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const updateProfile = useCallback(
-    (data: Partial<User> & { password?: string }) => {
+    async (data: Partial<User> & { password?: string }) => {
       if (!user) return;
-      const updated = updateMockUserProfile(user.id, data);
-      if (updated) {
-        setUser(updated);
-        sessionStorage.setItem('quiz_user', JSON.stringify(updated));
+      
+      const payload: any = {};
+      if (data.name) payload.nome = data.name;
+      if (data.email) payload.email = data.email;
+      if (data.password) payload.password = data.password;
+
+      try {
+        const res = await api.put('/perfil', payload);
+        const { token: newToken, user: updatedUser } = res.data;
+
+        if (newToken) {
+          localStorage.setItem('token', newToken);
+        }
+        
+        const formatUpdate: User = {
+          ...user,
+          name: updatedUser.name || user.name,
+          email: updatedUser.email || user.email,
+        };
+
+        setUser(formatUpdate);
+        sessionStorage.setItem('quiz_user', JSON.stringify(formatUpdate));
+      } catch (err: any) {
+        throw new Error(err.response?.data?.error || 'Erro ao atualizar perfil.');
       }
     },
     [user]

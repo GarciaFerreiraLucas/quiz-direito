@@ -1,13 +1,15 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import tagImage from '../../assets/tag.png';
-import { getCadastroItemById, saveCadastroItem } from '../../utils/cadastroStore';
+import api from '../../services/api';
+import { useToast } from '../../components/Toast/Toast';
 import './TagForm.css';
 
 export function TagForm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { showToast } = useToast();
 
   const editingId = useMemo(() => {
     const rawId = searchParams.get('id');
@@ -21,32 +23,53 @@ export function TagForm() {
 
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!editingId) return;
 
-    const item = getCadastroItemById('tags', editingId);
-    if (!item) return;
+    async function fetchItem() {
+      try {
+        const { data } = await api.get(`/tags/${editingId}`);
+        setNome(data.nome);
+        setDescricao(data.descricao);
+      } catch (err) {
+        console.error('Erro ao buscar tag', err);
+        showToast('Erro ao carregar os dados da tag.', 'error');
+      }
+    }
 
-    setNome(item.nome);
-    setDescricao(item.descricao);
-  }, [editingId]);
+    fetchItem();
+  }, [editingId, showToast]);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!nome.trim()) return;
+    if (!nome.trim() || isLoading) return;
 
-    saveCadastroItem(
-      'tags',
-      {
-        nome,
-        descricao,
-      },
-      editingId ?? undefined,
-    );
-
-    navigate('/dashboard/tags');
+    setIsLoading(true);
+    try {
+      if (editingId) {
+        await api.put(`/tags/${editingId}`, {
+          nome,
+          descricao,
+          ativo: true, // Assuming active by default on edit if not specified
+        });
+        showToast('Tag atualizada com sucesso.');
+      } else {
+        await api.post('/tags', {
+          nome,
+          descricao,
+        });
+        showToast('Tag cadastrada com sucesso.');
+      }
+      navigate('/dashboard/tags');
+    } catch (err) {
+      console.error('Erro ao salvar tag', err);
+      showToast('Erro ao salvar tag.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -79,8 +102,12 @@ export function TagForm() {
               onChange={(event) => setDescricao(event.target.value)}
             />
 
-            <button className="tag-form__button tag-form__button--primary" type="submit">
-              {editingId ? 'Salvar' : 'Cadastrar'}
+            <button
+              className="tag-form__button tag-form__button--primary"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? (editingId ? 'Salvando...' : 'Cadastrando...') : (editingId ? 'Salvar' : 'Cadastrar')}
             </button>
 
             <button

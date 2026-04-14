@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { getCadastroItems } from '../../utils/cadastroStore';
-import { getPerguntaById, savePergunta } from '../../utils/perguntasStore';
-import type { Alternativa } from '../../utils/perguntasStore';
+import api from '../../services/api';
 import './PerguntaForm.css';
 
-const DIFICULDADES = ['Fácil', 'Moderada', 'Difícil'] as const;
+const DIFICULDADES = ['facil', 'medio', 'dificil'] as const;
+const DIFICULDADE_LABELS: Record<string, string> = { facil: 'Fácil', medio: 'Moderada', dificil: 'Difícil' };
+
+type Alternativa = { texto: string; feedback: string; correta: boolean };
 
 function buildInitialAlternativas(): Alternativa[] {
   return [
@@ -31,20 +32,28 @@ export function PerguntaForm() {
     return numeric;
   }, [searchParams]);
 
-  const categorias = useMemo(
-    () =>
-      getCadastroItems('categorias')
-        .map((item) => item.nome)
-        .filter((nome, index, lista) => lista.indexOf(nome) === index),
-    [],
-  );
-
+  const [categorias, setCategorias] = useState<any[]>([]);
   const [pergunta, setPergunta] = useState('');
-  const [categoria, setCategoria] = useState('');
-  const [dificuldade, setDificuldade] = useState<(typeof DIFICULDADES)[number]>('Fácil');
+  const [categoriaId, setCategoriaId] = useState<number | ''>('');
+  const [dificuldade, setDificuldade] = useState<string>('facil');
   const [status, setStatus] = useState<'ativo' | 'inativo'>('ativo');
   const [alternativas, setAlternativas] = useState<Alternativa[]>(buildInitialAlternativas());
+  const [loading, setLoading] = useState(false);
 
+  // Fetch categorias from API
+  useEffect(() => {
+    async function loadCategorias() {
+      try {
+        const res = await api.get('/categorias');
+        setCategorias(res.data);
+      } catch (err) {
+        console.error('Erro ao buscar categorias:', err);
+      }
+    }
+    loadCategorias();
+  }, []);
+
+  // If editing, load existing question
   useEffect(() => {
     if (!Number.isFinite(quizId) || quizId <= 0) {
       navigate('/dashboard/quizzes');
@@ -53,14 +62,24 @@ export function PerguntaForm() {
 
     if (!editingId) return;
 
-    const item = getPerguntaById(quizId, editingId);
-    if (!item) return;
-
-    setPergunta(item.pergunta);
-    setCategoria(item.categoria);
-    setDificuldade(item.dificuldade);
-    setStatus(item.ativo ? 'ativo' : 'inativo');
-    setAlternativas(item.alternativas);
+    async function loadPergunta() {
+      try {
+        const res = await api.get(`/perguntas/${editingId}`);
+        const p = res.data;
+        setPergunta(p.pergunta);
+        setCategoriaId(p.categoriaId || '');
+        setDificuldade(p.dificuldade || 'facil');
+        setStatus(p.ativo ? 'ativo' : 'inativo');
+        if (p.alternativas && p.alternativas.length > 0) {
+          setAlternativas(
+            p.alternativas.map((a: any) => ({ texto: a.texto, feedback: a.feedback || '', correta: !!a.correta }))
+          );
+        }
+      } catch (err) {
+        console.error('Erro ao carregar pergunta para edição:', err);
+      }
+    }
+    loadPergunta();
   }, [quizId, editingId, navigate]);
 
   function updateAlternativa(index: number, patch: Partial<Alternativa>) {
@@ -73,29 +92,38 @@ export function PerguntaForm() {
     setAlternativas((current) => current.map((alt, i) => ({ ...alt, correta: i === index })));
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const hasCorreta = alternativas.some((alt) => alt.correta);
     const hasTextoVazio = alternativas.some((alt) => !alt.texto.trim());
 
-    if (!pergunta.trim() || !categoria.trim() || !hasCorreta || hasTextoVazio) {
+    if (!pergunta.trim() || !hasCorreta || hasTextoVazio) {
       return;
     }
 
-    savePergunta(
+    const payload = {
+      enunciado: pergunta.trim(),
+      categoriaId: categoriaId || null,
+      dificuldade,
+      status: status === 'ativo',
+      alternativas: alternativas.map((a) => ({ texto: a.texto.trim(), correta: a.correta })),
       quizId,
-      {
-        pergunta,
-        categoria,
-        dificuldade,
-        ativo: status === 'ativo',
-        alternativas,
-      },
-      editingId ?? undefined,
-    );
+    };
 
-    navigate(`/dashboard/quizzes/${quizId}/perguntas`);
+    try {
+      setLoading(true);
+      if (editingId) {
+        await api.put(`/perguntas/${editingId}`, payload);
+      } else {
+        await api.post('/perguntas', payload);
+      }
+      navigate(`/dashboard/quizzes/${quizId}/perguntas`);
+    } catch (err) {
+      console.error('Erro ao salvar pergunta:', err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -123,14 +151,13 @@ export function PerguntaForm() {
             <select
               id="pergunta-categoria"
               className="pergunta-form-page__select"
-              value={categoria}
-              onChange={(event) => setCategoria(event.target.value)}
-              required
+              value={categoriaId}
+              onChange={(event) => setCategoriaId(event.target.value ? Number(event.target.value) : '')}
             >
               <option value="">Selecionar</option>
-              {categorias.map((item) => (
-                <option key={item} value={item}>
-                  {item}
+              {categorias.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.nome}
                 </option>
               ))}
             </select>
@@ -142,11 +169,11 @@ export function PerguntaForm() {
               id="pergunta-dificuldade"
               className="pergunta-form-page__select"
               value={dificuldade}
-              onChange={(event) => setDificuldade(event.target.value as (typeof DIFICULDADES)[number])}
+              onChange={(event) => setDificuldade(event.target.value)}
             >
               {DIFICULDADES.map((item) => (
                 <option key={item} value={item}>
-                  {item}
+                  {DIFICULDADE_LABELS[item]}
                 </option>
               ))}
             </select>
@@ -207,8 +234,8 @@ export function PerguntaForm() {
           </div>
         </div>
 
-        <button className="pergunta-form-page__button pergunta-form-page__button--primary" type="submit">
-          {editingId ? 'Salvar' : 'Adicionar'}
+        <button className="pergunta-form-page__button pergunta-form-page__button--primary" type="submit" disabled={loading}>
+          {loading ? 'Salvando...' : editingId ? 'Salvar' : 'Adicionar'}
         </button>
 
         <button

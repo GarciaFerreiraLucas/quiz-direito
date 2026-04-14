@@ -22,7 +22,7 @@ export function Perfil() {
     }
   }, [user]);
 
-  const handleAlterar = (e: React.FormEvent) => {
+  const handleAlterar = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -34,15 +34,15 @@ export function Perfil() {
     }
 
     try {
-      updateProfile({
+      await updateProfile({
         name: nome,
         email: email,
         ...(senha ? { password: senha } : {}),
       });
       setSuccess('Perfil atualizado com sucesso!');
       setSenha(''); // Clear password field after update
-    } catch (err) {
-      setError('Erro ao atualizar perfil. Tente novamente.');
+    } catch (err: any) {
+      setError(err.message || 'Erro ao atualizar perfil. Tente novamente.');
     }
   };
 

@@ -1,5 +1,3 @@
-import logoUniversidade from '../../assets/logocombrasao.png';
-import logoDireito from '../../assets/logo-direito.png';
 import './Header.css';
 
 interface HeaderProps {
@@ -31,15 +29,6 @@ export function Header({ title = 'Início', onToggleSidebar }: HeaderProps) {
       <div className="header__mobile-title">
         <span className="header__mobile-title-main">Quiz Jurídico</span>
         <span className="header__mobile-title-sub">{title}</span>
-      </div>
-
-      <div className="header__logos">
-        <div className="header__logo-circle">
-          <img src={logoUniversidade} alt="UniRV" />
-        </div>
-        <div className="header__logo-circle">
-          <img src={logoDireito} alt="Direito" />
-        </div>
       </div>
     </header>
   );

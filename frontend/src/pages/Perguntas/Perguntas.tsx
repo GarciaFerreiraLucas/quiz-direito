@@ -4,8 +4,7 @@ import iconeAdicionar from '../../assets/icones/icone_adicionar.svg';
 import iconeAtivar from '../../assets/icones/icone_ativar.svg';
 import iconeInativar from '../../assets/icones/icone_inativar.svg';
 import iconeEditar from '../../assets/icones/icone_editar.svg';
-import { getPerguntas, togglePerguntaStatus } from '../../utils/perguntasStore';
-import type { PerguntaItem } from '../../utils/perguntasStore';
+import api from '../../services/api';
 import { TablePagination } from '../../components/Pagination';
 import './Perguntas.css';
 
@@ -16,7 +15,7 @@ export function Perguntas() {
   const params = useParams();
   const quizId = Number(params.quizId);
 
-  const [items, setItems] = useState<PerguntaItem[]>([]);
+  const [items, setItems] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -25,7 +24,15 @@ export function Perguntas() {
       return;
     }
 
-    setItems(getPerguntas(quizId));
+    async function fetchPerguntas() {
+      try {
+        const res = await api.get(`/perguntas?quizId=${quizId}`);
+        setItems(res.data);
+      } catch (err) {
+        console.error('Erro ao buscar perguntas:', err);
+      }
+    }
+    fetchPerguntas();
   }, [quizId, navigate]);
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(items.length / PAGE_SIZE)), [items.length]);
@@ -41,8 +48,13 @@ export function Perguntas() {
 
   const emptyRowsCount = Math.max(0, PAGE_SIZE - pageItems.length);
 
-  function onToggleStatus(perguntaId: number) {
-    setItems(togglePerguntaStatus(quizId, perguntaId));
+  async function onToggleStatus(perguntaId: number) {
+    try {
+      const { data } = await api.patch(`/perguntas/${perguntaId}/status`);
+      setItems((prev) => prev.map((item) => (item.id === perguntaId ? { ...item, ativo: data.ativo } : item)));
+    } catch (err) {
+      console.error('Erro ao alterar status:', err);
+    }
   }
 
   function onEdit(perguntaId: number) {
@@ -111,11 +123,13 @@ export function Perguntas() {
                     </div>
                   </td>
                 </tr>
-              ))}              {Array.from({ length: emptyRowsCount }).map((_, index) => (
+              ))}
+              {Array.from({ length: emptyRowsCount }).map((_, index) => (
                 <tr key={`empty-row-${index}`} className="perguntas-page__row--empty" aria-hidden="true">
                   <td colSpan={5}>&nbsp;</td>
                 </tr>
-              ))}            </tbody>
+              ))}
+            </tbody>
           </table>
         </div>
 
@@ -131,5 +145,3 @@ export function Perguntas() {
     </section>
   );
 }
-
-

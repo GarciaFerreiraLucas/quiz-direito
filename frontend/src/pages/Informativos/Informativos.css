@@ -167,13 +167,6 @@
   font-weight: 700;
   color: var(--text-dark);
   margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.informativos__card-title-icon {
-  font-size: 0.82rem;
 }
 
 .informativos__card-desc {
@@ -231,4 +224,158 @@
     padding: 8px 14px;
     font-size: 0.82rem;
   }
+
+  .informativos__header {
+    flex-direction: column;
+  }
+}
+
+/* ---- Header actions (add + filter) ---- */
+.informativos__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---- Add button ---- */
+.informativos__add-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #fff;
+  background-color: #183462;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: background-color 0.2s ease;
+}
+
+.informativos__add-btn:hover {
+  background-color: #122649;
+}
+
+.informativos__add-btn img {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) invert(1);
+}
+
+/* ---- Edit button on cards (icon style like other pages) ---- */
+.informativos__card-edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0;
+  transition: background-color 0.15s ease;
+}
+
+.informativos__card-edit:hover {
+  background-color: rgba(9, 64, 120, 0.12);
+}
+
+.informativos__card-edit img {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---- Pagination ---- */
+.informativos__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.informativos__pagination button {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid var(--primary, #2e5ba8);
+  background: transparent;
+  color: var(--primary, #2e5ba8);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.informativos__pagination button:hover:not(:disabled) {
+  background: var(--primary, #2e5ba8);
+  color: #fff;
+}
+
+.informativos__pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.informativos__page-info {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dark, #333);
+}
+
+/* ---- Skeleton loaders ---- */
+@keyframes skeleton-pulse {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.informativos__skeleton {
+  background: #dde1e8;
+  border-radius: 6px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.informativos__skeleton--tab {
+  width: 140px;
+  height: 38px;
+  border-radius: 24px;
+}
+
+.informativos__skeleton-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  background: #fff;
+}
+
+.informativos__skeleton--image {
+  width: 100%;
+  height: 120px;
+  border-radius: 0;
+}
+
+.informativos__skeleton-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.informativos__skeleton--title {
+  width: 70%;
+  height: 16px;
+}
+
+.informativos__skeleton--text {
+  width: 100%;
+  height: 12px;
+}
+
+.informativos__skeleton--short {
+  width: 45%;
 }

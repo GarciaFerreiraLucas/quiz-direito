@@ -1,24 +1,41 @@
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockInformativos } from './data';
+import api from '../../services/api';
 import './InformativoDetalhe.css';
 
 export function InformativoDetalhe() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const item = mockInformativos.find((i) => i.id === Number(id));
+  const [item, setItem] = useState<any>(null);
+  const [related, setRelated] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchDetalhe() {
+      try {
+        const res = await api.get(`/informativos/${id}`);
+        setItem(res.data);
+        
+        // Fetch related logic here if backend supported it, for now mock an empty array or fetch all to slice
+        const allRes = await api.get('/informativos');
+        const others = allRes.data.filter((i: any) => i.id !== Number(id)).slice(0, 3);
+        setRelated(others);
+      } catch (err) {
+        console.error('Erro', err);
+      }
+    }
+    fetchDetalhe();
+  }, [id]);
 
   if (!item) {
     return (
       <section className="info-detalhe" id="informativo-detalhe-page">
-        <p>Informativo não encontrado.</p>
+        <p>Carregando Informativo...</p>
         <button className="info-detalhe__btn" onClick={() => navigate('/dashboard/informativos')}>
           Voltar
         </button>
       </section>
     );
   }
-
-  const related = mockInformativos.filter((i) => i.id !== item.id).slice(0, 3);
 
   return (
     <section className="info-detalhe" id="informativo-detalhe-page">
@@ -30,7 +47,7 @@ export function InformativoDetalhe() {
             Por {item.author} • {item.date} • {item.category}
           </p>
 
-          {item.content.split('\n\n').map((p, i) => (
+          {item.content.split('\n\n').map((p: string, i: number) => (
             <p className="info-detalhe__text" key={i}>
               {p}
             </p>
@@ -51,13 +68,13 @@ export function InformativoDetalhe() {
             Voltar
           </button>
           <button className="info-detalhe__btn info-detalhe__btn--action">
-            Curtir 👍
+            Curtir
           </button>
           <button className="info-detalhe__btn info-detalhe__btn--action">
-            Compartilhar 🔗
+            Compartilhar
           </button>
           <button className="info-detalhe__btn info-detalhe__btn--action">
-            Sinalizar erro ⚠️
+            Sinalizar erro
           </button>
         </aside>
       </div>
@@ -75,7 +92,6 @@ export function InformativoDetalhe() {
               <div className="informativos__card-image" />
               <div className="informativos__card-body">
                 <h3 className="informativos__card-title">
-                  <span className="informativos__card-title-icon">📄</span>
                   {card.title}
                 </h3>
                 <p className="informativos__card-desc">{card.summary}</p>
@@ -88,4 +104,3 @@ export function InformativoDetalhe() {
     </section>
   );
 }
-

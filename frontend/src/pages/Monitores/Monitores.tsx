@@ -4,23 +4,52 @@ import iconeAdicionar from '../../assets/icones/icone_adicionar.svg';
 import iconeAtivar from '../../assets/icones/icone_ativar.svg';
 import iconeInativar from '../../assets/icones/icone_inativar.svg';
 import iconeEditar from '../../assets/icones/icone_editar.svg';
-import { getMonitores, toggleMonitorStatus } from '../../utils/monitorStore';
-import type { MonitorItem } from '../../utils/monitorStore';
+import api from '../../services/api';
 import { TablePagination } from '../../components/Pagination';
+import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
+import { useToast } from '../../components/Toast/Toast';
 import './Monitores.css';
+
+type MonitorItem = {
+  id: number;
+  nome: string;
+  email: string;
+  ativo: boolean;
+};
 
 const PAGE_SIZE = 8;
 
 export function Monitores() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [monitores, setMonitores] = useState<MonitorItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [confirmAction, setConfirmAction] = useState<{ id: number; nome: string; ativo: boolean } | null>(null);
 
   useEffect(() => {
-    setMonitores(getMonitores());
+    async function fetchData() {
+      try {
+        const res = await api.get('/monitores');
+        setMonitores(res.data);
+      } catch (err) {
+        console.error('Erro ao buscar monitores', err);
+      }
+    }
+    fetchData();
   }, []);
 
-  const totalPages = useMemo(() => Math.max(1, Math.ceil(monitores.length / PAGE_SIZE)), [monitores.length]);
+  const filteredItems = useMemo(() => {
+    if (!searchTerm.trim()) return monitores;
+    const term = searchTerm.toLowerCase();
+    return monitores.filter(
+      (item) =>
+        item.nome?.toLowerCase().includes(term) ||
+        item.email?.toLowerCase().includes(term)
+    );
+  }, [monitores, searchTerm]);
+
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE)), [filteredItems.length]);
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -30,14 +59,21 @@ export function Monitores() {
 
   const pageItems = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
-    return monitores.slice(start, start + PAGE_SIZE);
-  }, [currentPage, monitores]);
+    return filteredItems.slice(start, start + PAGE_SIZE);
+  }, [currentPage, filteredItems]);
 
   const emptyRowsCount = Math.max(0, PAGE_SIZE - pageItems.length);
 
-  function handleToggleStatus(id: number) {
-    const updated = toggleMonitorStatus(id);
-    setMonitores(updated);
+  async function handleToggleStatus(id: number) {
+    try {
+      const { data } = await api.patch(`/monitores/${id}/status`);
+      setMonitores((prev) => prev.map((item) => (item.id === id ? data : item)));
+      showToast(`Monitor ${data.ativo ? 'ativado' : 'desativado'} com sucesso.`);
+    } catch (err) {
+      console.error('Erro ao alterar status', err);
+      showToast('Erro ao alterar status.', 'error');
+    }
+    setConfirmAction(null);
   }
 
   function goToEdit(id: number) {
@@ -48,6 +84,14 @@ export function Monitores() {
     <section className="monitores-page" id="monitores-page">
       <div className="monitores-page__card">
         <div className="monitores-page__header">
+          <input
+            className="monitores-page__search"
+            type="text"
+            placeholder="Buscar monitores..."
+            value={searchTerm}
+            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+            id="monitores-search"
+          />
           <button className="monitores-page__add-btn" type="button" onClick={() => navigate('/dashboard/monitores/adicionar')}>
             <img src={iconeAdicionar} alt="" aria-hidden="true" />
             <span>Adicionar</span>
@@ -59,14 +103,16 @@ export function Monitores() {
             <thead>
               <tr>
                 <th>Nome</th>
+                <th>Email</th>
                 <th>Status</th>
-                <th>Acoes</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
               {pageItems.map((monitor) => (
                 <tr key={monitor.id}>
                   <td>{monitor.nome}</td>
+                  <td>{monitor.email}</td>
                   <td>
                     <span
                       className={`monitores-page__status ${
@@ -82,7 +128,7 @@ export function Monitores() {
                         className="monitores-page__icon-btn"
                         type="button"
                         aria-label={monitor.ativo ? 'Inativar monitor' : 'Ativar monitor'}
-                        onClick={() => handleToggleStatus(monitor.id)}
+                        onClick={() => setConfirmAction({ id: monitor.id, nome: monitor.nome, ativo: monitor.ativo })}
                       >
                         <img src={monitor.ativo ? iconeInativar : iconeAtivar} alt="" aria-hidden="true" />
                       </button>
@@ -98,11 +144,13 @@ export function Monitores() {
                     </div>
                   </td>
                 </tr>
-              ))}              {Array.from({ length: emptyRowsCount }).map((_, index) => (
+              ))}
+              {Array.from({ length: emptyRowsCount }).map((_, index) => (
                 <tr key={`empty-row-${index}`} className="monitores-page__row--empty" aria-hidden="true">
-                  <td colSpan={3}>&nbsp;</td>
+                  <td colSpan={4}>&nbsp;</td>
                 </tr>
-              ))}            </tbody>
+              ))}
+            </tbody>
           </table>
         </div>
 
@@ -114,8 +162,17 @@ export function Monitores() {
           onPageChange={setCurrentPage}
         />
       </div>
+
+      {confirmAction && (
+        <ConfirmModal
+          title={confirmAction.ativo ? 'Desativar Monitor' : 'Ativar Monitor'}
+          message={`Deseja ${confirmAction.ativo ? 'desativar' : 'ativar'} o monitor "${confirmAction.nome}"?`}
+          confirmLabel={confirmAction.ativo ? 'Desativar' : 'Ativar'}
+          danger={confirmAction.ativo}
+          onConfirm={() => handleToggleStatus(confirmAction.id)}
+          onCancel={() => setConfirmAction(null)}
+        />
+      )}
     </section>
   );
 }
-
-

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
@@ -13,6 +13,7 @@ const routeTitles: Record<string, string> = {
   '/dashboard/categorias': 'Categorias',
   '/dashboard/tags': 'Tags',
   '/dashboard/monitores': 'Monitores',
+  '/dashboard/historico': 'Histórico',
 };
 
 function getTitle(pathname: string): string {
@@ -29,6 +30,11 @@ export function DashboardLayout() {
   const location = useLocation();
   const title = getTitle(location.pathname);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // SEO: Dynamic page title
+  useEffect(() => {
+    document.title = `${title} — Quiz Direito`;
+  }, [title]);
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const closeSidebar = () => setSidebarOpen(false);

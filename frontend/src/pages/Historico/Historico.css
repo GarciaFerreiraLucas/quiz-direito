@@ -1,0 +1,123 @@
+.historico {
+  padding: 0;
+}
+
+.historico__header {
+  margin-bottom: 1.5rem;
+}
+
+.historico__title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #15284b;
+  margin: 0 0 0.25rem;
+}
+
+.historico__subtitle {
+  font-size: 0.95rem;
+  color: #838e9c;
+  margin: 0;
+}
+
+.historico__empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #838e9c;
+  font-size: 0.95rem;
+}
+
+.historico__card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.historico__table-wrap {
+  overflow-x: auto;
+}
+
+.historico__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.historico__table th {
+  background: #f5f6fa;
+  color: #15284b;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.85rem 1rem;
+  white-space: nowrap;
+  border-bottom: 2px solid #e9eaf0;
+}
+
+.historico__table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f0f1f5;
+  color: #2d3a4a;
+  vertical-align: middle;
+}
+
+.historico__table tbody tr:hover {
+  background: #f8f9fc;
+}
+
+.historico__score {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.historico__score--high {
+  background: #d4edda;
+  color: #155724;
+}
+
+.historico__score--mid {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.historico__score--low {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.historico__status {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.historico__status--done {
+  background: #d4edda;
+  color: #155724;
+}
+
+.historico__status--pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.historico__btn-voltar {
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.5rem;
+  background: #15284b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.historico__btn-voltar:hover {
+  background: #1e3a5f;
+}

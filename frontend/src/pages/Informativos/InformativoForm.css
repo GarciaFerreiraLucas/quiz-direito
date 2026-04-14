@@ -1,0 +1,179 @@
+.informativo-form-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.informativo-form-page__card {
+  width: 100%;
+  max-width: 680px;
+  border-radius: 12px;
+  border: 1px solid #d6d9dd;
+  background-color: #f1f1f1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 28px 32px;
+}
+
+.informativo-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.informativo-form__title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #111e3b;
+  margin-bottom: 18px;
+  margin-top: 0;
+}
+
+.informativo-form__error {
+  color: #c0392b;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.informativo-form__label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-style: italic;
+  color: #111e3b;
+  margin-bottom: 4px;
+  margin-top: 12px;
+}
+
+.informativo-form__required {
+  color: #c0392b;
+}
+
+.informativo-form__input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cfd5dc;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  background: #fff;
+  outline: none;
+  margin-bottom: 4px;
+  box-sizing: border-box;
+}
+
+.informativo-form__input:focus {
+  border-color: #2e5ba8;
+}
+
+.informativo-form__textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cfd5dc;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  background: #fff;
+  outline: none;
+  margin-bottom: 4px;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+  min-height: 140px;
+}
+
+.informativo-form__textarea:focus {
+  border-color: #2e5ba8;
+}
+
+.informativo-form__select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cfd5dc;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  background: #fff;
+  outline: none;
+  margin-bottom: 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.informativo-form__button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-style: italic;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.informativo-form__button--primary {
+  background-color: #2e5ba8;
+  color: #fff;
+}
+
+.informativo-form__button--primary:hover {
+  background-color: #24478a;
+}
+
+.informativo-form__button--secondary {
+  background-color: transparent;
+  color: #2e5ba8;
+  border: 2px solid #2e5ba8;
+}
+
+.informativo-form__button--secondary:hover {
+  background-color: rgba(46, 91, 168, 0.06);
+}
+
+.informativo-form__tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+  margin-top: 4px;
+}
+
+.informativo-form__tag-chip {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1.5px solid #cfd5dc;
+  background: #fff;
+  color: #5a6a7e;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.informativo-form__tag-chip:hover {
+  border-color: #2e5ba8;
+  color: #2e5ba8;
+}
+
+.informativo-form__tag-chip--active {
+  background: #2e5ba8;
+  border-color: #2e5ba8;
+  color: #fff;
+}
+
+.informativo-form__tag-chip--active:hover {
+  background: #24478a;
+  border-color: #24478a;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .informativo-form-page__card {
+    padding: 18px 16px;
+  }
+
+  .informativo-form__title {
+    font-size: 1.2rem;
+  }
+}
