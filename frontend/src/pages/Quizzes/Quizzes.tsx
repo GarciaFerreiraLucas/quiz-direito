@@ -1,14 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import iconeAdicionar from '../../assets/icones/icone_adicionar.svg';
-import iconeAtivar from '../../assets/icones/icone_ativar.svg';
-import iconeInativar from '../../assets/icones/icone_inativar.svg';
-import iconeEditar from '../../assets/icones/icone_editar.svg';
-import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
-import { TablePagination } from '../../components/Pagination';
-import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
-import './Quizzes.css';
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import iconeAdicionar from "../../assets/icones/icone_adicionar.svg";
+import iconeAtivar from "../../assets/icones/icone_ativar.svg";
+import iconeInativar from "../../assets/icones/icone_inativar.svg";
+import iconeEditar from "../../assets/icones/icone_editar.svg";
+import { useAuth } from "../../context/AuthContext";
+import api from "../../services/api";
+import { TablePagination } from "../../components/Pagination";
+import { ConfirmModal } from "../../components/ConfirmModal/ConfirmModal";
+import "./Quizzes.css";
 
 const PAGE_SIZE = 8;
 
@@ -23,11 +23,11 @@ function QuizzesUser() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await api.get('/quizzes');
+        const res = await api.get("/quizzes");
         // Only show active quizzes to students
         setQuizzes((res.data || []).filter((q: any) => q.ativo !== false));
       } catch (err) {
-        console.error('Erro ao carregar quizzes:', err);
+        console.error("Erro ao carregar quizzes:", err);
       } finally {
         setLoading(false);
       }
@@ -47,7 +47,9 @@ function QuizzesUser() {
     <section className="user-quizzes" id="quizzes-page">
       <div className="user-quizzes__header">
         <h2 className="user-quizzes__title">Quizzes Disponíveis</h2>
-        <p className="user-quizzes__subtitle">Escolha um quiz e teste seus conhecimentos em Direito!</p>
+        <p className="user-quizzes__subtitle">
+          Escolha um quiz e teste seus conhecimentos em Direito!
+        </p>
       </div>
 
       {quizzes.length === 0 ? (
@@ -59,9 +61,11 @@ function QuizzesUser() {
           {quizzes.map((quiz) => (
             <article className="user-quizzes__card" key={quiz.id}>
               <div className="user-quizzes__card-body">
-                <h3 className="user-quizzes__card-title">{quiz.titulo || quiz.nome}</h3>
+                <h3 className="user-quizzes__card-title">
+                  {quiz.titulo || quiz.nome}
+                </h3>
                 <p className="user-quizzes__card-desc">
-                  {quiz.descricao || 'Teste seus conhecimentos neste quiz.'}
+                  {quiz.descricao || "Teste seus conhecimentos neste quiz."}
                 </p>
 
                 <div className="user-quizzes__card-meta">
@@ -100,16 +104,20 @@ export function Quizzes() {
   const { user } = useAuth();
   const [items, setItems] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [confirmAction, setConfirmAction] = useState<{ id: number; nome: string; ativo: boolean } | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [confirmAction, setConfirmAction] = useState<{
+    id: number;
+    nome: string;
+    ativo: boolean;
+  } | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await api.get('/quizzes');
+        const res = await api.get("/quizzes");
         setItems(res.data);
       } catch (err) {
-        console.error('Erro ao buscar os quizzes', err);
+        console.error("Erro ao buscar os quizzes", err);
       }
     }
     fetchData();
@@ -123,11 +131,14 @@ export function Quizzes() {
         item.titulo?.toLowerCase().includes(term) ||
         item.nome?.toLowerCase().includes(term) ||
         item.categoria?.toLowerCase().includes(term) ||
-        item.descricao?.toLowerCase().includes(term)
+        item.descricao?.toLowerCase().includes(term),
     );
   }, [items, searchTerm]);
 
-  const totalPages = useMemo(() => Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE)), [filteredItems.length]);
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE)),
+    [filteredItems.length],
+  );
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -147,7 +158,7 @@ export function Quizzes() {
       const { data } = await api.patch(`/quizzes/${id}/status`);
       setItems((prev) => prev.map((item) => (item.id === id ? data : item)));
     } catch (err) {
-      console.error('Erro ao alterar status', err);
+      console.error("Erro ao alterar status", err);
     }
     setConfirmAction(null);
   }
@@ -161,7 +172,7 @@ export function Quizzes() {
   }
 
   // User role sees the card-based quiz browser
-  if (user?.role === 'user') {
+  if (user?.role === "user") {
     return <QuizzesUser />;
   }
 
@@ -175,13 +186,16 @@ export function Quizzes() {
             type="text"
             placeholder="Buscar quizzes..."
             value={searchTerm}
-            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
             id="quizzes-search"
           />
           <button
             className="quizzes-list-page__add-btn"
             type="button"
-            onClick={() => navigate('/dashboard/quizzes/adicionar')}
+            onClick={() => navigate("/dashboard/quizzes/adicionar")}
           >
             <img src={iconeAdicionar} alt="" aria-hidden="true" />
             <span>Adicionar</span>
@@ -203,15 +217,17 @@ export function Quizzes() {
               {pageItems.map((item) => (
                 <tr key={item.id} onClick={() => goToPerguntas(item.id)}>
                   <td>{item.titulo}</td>
-                  <td>{item.categoria || '—'}</td>
+                  <td>{item.categoria || "—"}</td>
                   <td>{Number(item.total_perguntas) || 0}</td>
                   <td>
                     <span
                       className={`quizzes-list-page__status ${
-                        item.ativo ? 'quizzes-list-page__status--active' : 'quizzes-list-page__status--inactive'
+                        item.ativo
+                          ? "quizzes-list-page__status--active"
+                          : "quizzes-list-page__status--inactive"
                       }`}
                     >
-                      {item.ativo ? 'Ativo' : 'Inativo'}
+                      {item.ativo ? "Ativo" : "Inativo"}
                     </span>
                   </td>
                   <td>
@@ -219,13 +235,21 @@ export function Quizzes() {
                       <button
                         className="quizzes-list-page__icon-btn"
                         type="button"
-                        aria-label={item.ativo ? 'Inativar' : 'Ativar'}
+                        aria-label={item.ativo ? "Inativar" : "Ativar"}
                         onClick={(event) => {
                           event.stopPropagation();
-                          setConfirmAction({ id: item.id, nome: item.titulo || item.nome, ativo: !!item.ativo });
+                          setConfirmAction({
+                            id: item.id,
+                            nome: item.titulo || item.nome,
+                            ativo: !!item.ativo,
+                          });
                         }}
                       >
-                        <img src={item.ativo ? iconeInativar : iconeAtivar} alt="" aria-hidden="true" />
+                        <img
+                          src={item.ativo ? iconeInativar : iconeAtivar}
+                          alt=""
+                          aria-hidden="true"
+                        />
                       </button>
 
                       <button
@@ -244,7 +268,11 @@ export function Quizzes() {
                 </tr>
               ))}
               {Array.from({ length: emptyRowsCount }).map((_, index) => (
-                <tr key={`empty-row-${index}`} className="quizzes-list-page__row--empty" aria-hidden="true">
+                <tr
+                  key={`empty-row-${index}`}
+                  className="quizzes-list-page__row--empty"
+                  aria-hidden="true"
+                >
                   <td colSpan={5}>&nbsp;</td>
                 </tr>
               ))}
@@ -264,9 +292,9 @@ export function Quizzes() {
 
       {confirmAction && (
         <ConfirmModal
-          title={confirmAction.ativo ? 'Desativar Quiz' : 'Ativar Quiz'}
-          message={`Deseja ${confirmAction.ativo ? 'desativar' : 'ativar'} o quiz "${confirmAction.nome}"?`}
-          confirmLabel={confirmAction.ativo ? 'Desativar' : 'Ativar'}
+          title={confirmAction.ativo ? "Desativar Quiz" : "Ativar Quiz"}
+          message={`Deseja ${confirmAction.ativo ? "desativar" : "ativar"} o quiz "${confirmAction.nome}"?`}
+          confirmLabel={confirmAction.ativo ? "Desativar" : "Ativar"}
           danger={confirmAction.ativo}
           onConfirm={() => handleToggleStatus(confirmAction.id)}
           onCancel={() => setConfirmAction(null)}
