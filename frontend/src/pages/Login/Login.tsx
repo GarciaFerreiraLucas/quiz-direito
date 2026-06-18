@@ -28,8 +28,17 @@ export function Login() {
       } else {
         setError('Usuário ou senha incorretos.');
       }
-    } catch {
-      setError('Erro ao conectar com o servidor.');
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { status?: number; data?: { error?: string } } };
+      if (errorObj.response?.status === 429) {
+        setError(errorObj.response.data?.error || 'Muitas tentativas de login. Tente novamente em 15 minutos.');
+      } else if (errorObj.response?.status === 401) {
+        setError(errorObj.response.data?.error || 'Usuário ou senha incorretos.');
+      } else if (errorObj.response?.status === 400) {
+        setError(errorObj.response.data?.error || 'Campos inválidos.');
+      } else {
+        setError('Erro ao conectar com o servidor.');
+      }
     }
   };
 

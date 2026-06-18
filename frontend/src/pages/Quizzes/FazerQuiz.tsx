@@ -31,8 +31,9 @@ export function FazerQuiz() {
         setQuiz(res.data.quiz);
         setTentativaId(res.data.tentativaId);
         setPerguntas(res.data.perguntas);
-      } catch (err: any) {
-        setError(err.response?.data?.error || 'Erro ao iniciar o quiz.');
+      } catch (err: unknown) {
+        const errorObj = err as { response?: { data?: { error?: string } } };
+        setError(errorObj.response?.data?.error || 'Erro ao iniciar o quiz.');
       } finally {
         setLoading(false);
       }
@@ -94,8 +95,9 @@ export function FazerQuiz() {
       }
       
       setResultado(res.data);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Erro ao finalizar quiz.');
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { error?: string } } };
+      setError(errorObj.response?.data?.error || 'Erro ao finalizar quiz.');
     } finally {
       setLoading(false);
     }
@@ -183,7 +185,16 @@ export function FazerQuiz() {
   return (
     <section className="fazer-quiz" id="fazer-quiz-page">
       <div className="fazer-quiz__card">
-        <h2 className="fazer-quiz__title">{quiz?.titulo}</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <h2 className="fazer-quiz__title" style={{ margin: 0 }}>{quiz?.titulo}</h2>
+          <button
+            className="fazer-quiz__btn fazer-quiz__btn--secondary"
+            style={{ padding: '6px 12px', fontSize: '0.95rem', borderColor: '#b46b6b', color: '#b46b6b' }}
+            onClick={() => { if (window.confirm('Deseja realmente sair do quiz? O progresso não finalizado será perdido.')) navigate('/dashboard/quizzes'); }}
+          >
+            Sair do Quiz
+          </button>
+        </div>
 
         <div className="fazer-quiz__progress-bar">
           <div className="fazer-quiz__progress-fill" style={{ width: `${progresso}%` }} />

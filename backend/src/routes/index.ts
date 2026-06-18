@@ -43,6 +43,14 @@ const passwordResetLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const responderLimiter = rateLimit({
+  windowMs: 1000, // 1 second
+  max: 3, // max 3 answers per second
+  message: { error: 'Frequência de respostas muito alta. Aguarde um momento.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Public routes
 router.get('/home', getHomeInfo);
 router.post('/login', loginLimiter, login);
@@ -106,7 +114,7 @@ router.patch('/monitores/:id/status', authorize('admin', 'monitor'), toggleMonit
 
 // Tentativas (Quiz execution)
 router.post('/tentativas/:id_quiz', iniciarTentativa as any);
-router.post('/tentativas/:id_tentativa/responder', salvarResposta as any);
+router.post('/tentativas/:id_tentativa/responder', responderLimiter, salvarResposta as any);
 router.post('/tentativas/:id_tentativa/finalizar', finalizarTentativa as any);
 router.get('/tentativas/historico', requireAuth, getHistorico as any);
 

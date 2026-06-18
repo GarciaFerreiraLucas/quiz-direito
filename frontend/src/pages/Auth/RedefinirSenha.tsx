@@ -53,9 +53,10 @@ export function RedefinirSenha() {
       setFeedback({ message: res.data.message, type: 'success' });
       // Redirect after success
       setTimeout(() => navigate('/'), 3000);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { error?: string } } };
       setFeedback({
-        message: err.response?.data?.error || 'Erro ao conectar no servidor.',
+        message: errorObj.response?.data?.error || 'Erro ao conectar no servidor.',
         type: 'error',
       });
     } finally {
@@ -121,13 +122,11 @@ export function RedefinirSenha() {
             </form>
           ) : null}
 
-          {(!token || feedback?.type === 'success') && (
-            <div className="login-page__links" style={{ marginTop: '24px', justifyContent: 'center' }}>
-              <Link to="/" className="login-page__link">
-                Voltar ao Login
-              </Link>
-            </div>
-          )}
+          <div className="login-page__links" style={{ marginTop: '24px', justifyContent: 'center' }}>
+            <Link to="/" className="login-page__link">
+              Voltar ao Login
+            </Link>
+          </div>
         </div>
       </div>
       <Footer />

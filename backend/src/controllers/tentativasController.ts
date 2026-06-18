@@ -24,19 +24,7 @@ export const iniciarTentativa = async (req: AuthenticatedRequest, res: Response)
 
     const quiz = quizRows[0];
 
-    // Verificar limite de tentativas (only if logged in)
-    if (userId && quiz.tentativas_max) {
-      const tentativasCount = await conn.query(
-        'SELECT COUNT(*) AS total FROM tentativa WHERE id_usuario = ? AND id_quiz = ?',
-        [userId, quizId]
-      );
-      if (tentativasCount[0].total >= quiz.tentativas_max) {
-        res.status(403).json({ error: `Você atingiu o limite de ${quiz.tentativas_max} tentativas para este quiz.` });
-        return;
-      }
-    }
-
-    // Buscar perguntas do quiz com alternativas
+    // Buscar perguntas do quiz
     const perguntas = await conn.query(
       `SELECT p.id_pergunta, p.enunciado, p.dificuldade
        FROM pergunta p
@@ -53,11 +41,37 @@ export const iniciarTentativa = async (req: AuthenticatedRequest, res: Response)
     // Criar a tentativa (only if logged in)
     let tentativaId = 0;
     if (userId) {
-      const result = await conn.query(
-        'INSERT INTO tentativa (id_usuario, id_quiz) VALUES (?, ?)',
-        [userId, quizId]
-      );
-      tentativaId = Number(result.insertId);
+      await conn.beginTransaction();
+      try {
+        // Lock user to serialize concurrent attempts creation by this user
+        await conn.query(
+          'SELECT id_usuario FROM usuario WHERE id_usuario = ? FOR UPDATE',
+          [userId]
+        );
+
+        // Verificar limite de tentativas
+        if (quiz.tentativas_max) {
+          const tentativasCount = await conn.query(
+            'SELECT COUNT(*) AS total FROM tentativa WHERE id_usuario = ? AND id_quiz = ?',
+            [userId, quizId]
+          );
+          if (tentativasCount[0].total >= quiz.tentativas_max) {
+            await conn.rollback();
+            res.status(403).json({ error: `Você atingiu o limite de ${quiz.tentativas_max} tentativas para este quiz.` });
+            return;
+          }
+        }
+
+        const result = await conn.query(
+          'INSERT INTO tentativa (id_usuario, id_quiz) VALUES (?, ?)',
+          [userId, quizId]
+        );
+        tentativaId = Number(result.insertId);
+        await conn.commit();
+      } catch (txnErr) {
+        await conn.rollback();
+        throw txnErr;
+      }
     } else {
       // For guests, we use a negative ID to signal "no persistence"
       tentativaId = -1;

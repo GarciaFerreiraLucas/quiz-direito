@@ -8,6 +8,14 @@ import api from '../../services/api';
 import { TablePagination } from '../../components/Pagination';
 import './Perguntas.css';
 
+type PerguntaItem = {
+  id: number;
+  pergunta: string;
+  categoria: string;
+  dificuldade: string;
+  ativo: boolean;
+};
+
 const PAGE_SIZE = 8;
 
 export function Perguntas() {
@@ -15,7 +23,7 @@ export function Perguntas() {
   const params = useParams();
   const quizId = Number(params.quizId);
 
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<PerguntaItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -37,14 +45,12 @@ export function Perguntas() {
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(items.length / PAGE_SIZE)), [items.length]);
 
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-  }, [currentPage, totalPages]);
+  const safeCurrentPage = Math.min(currentPage, totalPages);
 
   const pageItems = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
+    const start = (safeCurrentPage - 1) * PAGE_SIZE;
     return items.slice(start, start + PAGE_SIZE);
-  }, [currentPage, items]);
+  }, [safeCurrentPage, items]);
 
   const emptyRowsCount = Math.max(0, PAGE_SIZE - pageItems.length);
 
@@ -65,6 +71,13 @@ export function Perguntas() {
     <section className="perguntas-page" id="perguntas-page">
       <div className="perguntas-page__card">
         <div className="perguntas-page__header">
+          <button
+            className="perguntas-page__back-btn"
+            type="button"
+            onClick={() => navigate('/dashboard/quizzes')}
+          >
+            Voltar
+          </button>
           <button
             className="perguntas-page__add-btn"
             type="button"
@@ -136,7 +149,7 @@ export function Perguntas() {
         <TablePagination
           className="perguntas-page__pagination"
           pageNumberClassName="perguntas-page__page-number"
-          currentPage={currentPage}
+          currentPage={safeCurrentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
           ariaLabel="Paginação"
